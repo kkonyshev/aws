@@ -5,6 +5,8 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 import com.amazonaws.services.simpleemail.model.*;
 /**
@@ -17,6 +19,18 @@ public class SESPackage  {
     // production access, this address must be verified.
     static final String BODY = "This email was sent through Amazon SES by using the AWS SDK for Java.";
     static final String SUBJECT = "Поступил новый заказ на авто";
+
+    public static void cardorderevent(DynamodbEvent ddbEvent, Context context) {
+        LambdaLogger logger = context.getLogger();
+        for (DynamodbEvent.DynamodbStreamRecord record : ddbEvent.getRecords()){
+            logger.log(record.getEventID() + "\n");
+            logger.log(record.getEventName() + "\n");
+            logger.log(record.getDynamodb().toString() + "\n");
+
+        }
+        System.out.println("Successfully processed " + ddbEvent.getRecords().size() + " records.");
+        carorder(context);
+    }
 
     public static void carorder(Context context) {
 
